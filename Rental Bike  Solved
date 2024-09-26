@@ -1,0 +1,89 @@
+    Answere 1 .
+
+     select category, sum(case when status ='available' then 1 else 0 end) as number_of_bikes
+     from bike
+     group by category
+     having sum(case when status ='available' then 1 else 0 end)>2
+
+
+   Answere 2.
+
+   select c.name, count(m.id) as membership_count 
+    from membership m
+    right join customer c on m.customer_id = c.id
+    group by c.name
+    order by membership_count desc
+
+
+   Answere 3.
+
+   select id, category, price_per_hour,
+   case when category = 'electric' then price_per_hour - cast((price_per_hour/10) as float)
+   when category = 'mountain bike' then price_per_hour - cast((price_per_hour/20) as float) 
+   else price_per_hour - cast((price_per_hour/50) as float) end as new_price_per_hour,
+   price_per_day,
+   case when category = 'electric' then price_per_day - cast((price_per_day/20) as float)
+   when category = 'mountain bike' then price_per_hour - cast((price_per_hour/50) as float) 
+   else price_per_hour - cast((price_per_hour/50) as float) end as new_price_per_daily
+   from bike
+
+
+  Answere 4.
+           
+	select category, count(case when status = 'available' then 1 else 0 end) as avilable_count_bikes
+  ,count(case when status = 'rented' then 1 else 0 end) as rented_bikes_count
+   from bike
+   group by category 
+
+
+  Answere 5.
+
+    select  year(start_timestamp), month(start_timestamp) as month_Wise, sum(total_paid) as total_paid_num
+    from rental
+    group by year(start_timestamp), month(start_timestamp)
+    order by total_paid_num desc 
+
+
+  Answere 6.
+
+    select year(start_date) as year_wise, month(start_date) as month_wise, 
+    mt.name as membership_Type , sum(m.total_paid) as total_revenue 
+    from membership m
+    right join membership_type mt on m.membership_type_id = mt.id
+    group by  year(start_date), month(start_date), 
+    mt.name 
+    order by year_wise, month_wise, membership_Type
+
+
+  Answere 7.
+
+   select mt.name as membership_Type, month(start_date) as month_wise, 
+   sum(total_paid) as total_revenue
+   from membership m
+   inner join membership_type mt on m.membership_type_id = mt.id
+   where year(start_date) = 2023
+   group by mt.name,  month(start_date)
+   order by  total_revenue, month_wise
+
+         
+
+  Answere 8 .
+
+   with customer_seg as (
+   select customer_id, count(*) as customer_count
+   from rental r
+   group by customer_id
+   ),
+   customer_seg2 as ( 
+   select customer_id, case when customer_count >10 then 'more than 10'
+               when customer_count between 5 and 10 then 'between 5 to 10'
+			   else 'fewer than 5' end  as categories  
+   from customer_seg
+   )
+  select categories, count(*) as customer_count
+  from customer_seg2
+  group by categories
+  order by customer_count
+
+         
+    
